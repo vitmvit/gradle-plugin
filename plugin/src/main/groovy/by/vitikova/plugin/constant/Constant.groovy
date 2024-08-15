@@ -17,21 +17,22 @@ interface Constant {
     // command
     public static final String PUSH_TAG = 'pushTag'
     public static final String DEFAULT_TAG_VERSION = 'v0.1'
-    public static final String RC = '-rc'
-    public static final String SNAPSHOT = '-SNAPSHOT'
-    public static final String GIT = 'git'
-    public static final String VERSION = 'version'
-    public static final String DESCRIBE = 'describe'
-    public static final String TAG = 'tag'
-    public static final String TAGS = '--tags'
+
     public static final String ABBREV = '--abbrev='
     public static final String BRANCH = 'branch'
-    public static final String SHOW_CURRENT = '--show-current'
-    public static final String PUSH = 'push'
-    public static final String ORIGIN = 'origin'
+    public static final String DESCRIBE = 'describe'
     public static final String DIFF = 'diff'
+    public static final String GIT = 'git'
     public static final String LIST = '-l'
+    public static final String ORIGIN = 'origin'
+    public static final String PUSH = 'push'
+    public static final String RC = '-rc'
+    public static final String SHOW_CURRENT = '--show-current'
+    public static final String SNAPSHOT = '-SNAPSHOT'
     public static final String SORT = '--sort='
+    public static final String TAG = 'tag'
+    public static final String TAGS = '--tags'
+    public static final String VERSION = 'version'
 
     // regex
     public static final String VERSION_REGEX = /\d+\.\d+/

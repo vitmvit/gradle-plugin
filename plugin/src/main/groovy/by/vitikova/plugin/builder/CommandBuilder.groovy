@@ -34,21 +34,22 @@ class CommandBuilder {
     }
 
     /**
-     * Добавляет команду `git`.
+     * Добавляет команду `abbrev` с указанным числом.
      *
+     * @param number число для команды `abbrev`.
      * @return текущий экземпляр `CommandBuilder`.
      */
-    CommandBuilder git() {
-        return this.command(GIT)
+    CommandBuilder abbrev(int number) {
+        return this.command("$ABBREV$number")
     }
 
     /**
-     * Добавляет команду `version`.
+     * Добавляет команду `branch`.
      *
      * @return текущий экземпляр `CommandBuilder`.
      */
-    CommandBuilder version() {
-        return this.command(VERSION)
+    CommandBuilder branch() {
+        return this.command(BRANCH)
     }
 
     /**
@@ -58,6 +59,60 @@ class CommandBuilder {
      */
     CommandBuilder describe() {
         return this.command(DESCRIBE)
+    }
+
+    /**
+     * Добавляет команду `diff`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder diff() {
+        return this.command(DIFF)
+    }
+
+    /**
+     * Добавляет команду `git`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder git() {
+        return this.command(GIT)
+    }
+
+    /**
+     * Добавляет команду `list`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder list() {
+        return this.command(LIST)
+    }
+
+    /**
+     * Добавляет команду `origin`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder origin() {
+        return this.command(ORIGIN)
+    }
+
+    /**
+     * Добавляет команду `push`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder push() {
+        return this.command(PUSH)
+    }
+
+    /**
+     * Добавляет команду `showCurrent`.
+     *
+     * @return текущий экземпляр `CommandBuilder`.
+     */
+    CommandBuilder showCurrent() {
+        return this.command(SHOW_CURRENT)
     }
 
     /**
@@ -79,67 +134,12 @@ class CommandBuilder {
     }
 
     /**
-     * Добавляет команду `abbrev` с указанным числом.
-     *
-     * @param number число для команды `abbrev`.
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder abbrev(int number) {
-        return this.command("$ABBREV$number")
-    }
-
-    /**
-     * Добавляет команду `branch`.
+     * Добавляет команду `version`.
      *
      * @return текущий экземпляр `CommandBuilder`.
      */
-    CommandBuilder branch() {
-        return this.command(BRANCH)
-    }
-
-    /**
-     * Добавляет команду `showCurrent`.
-     *
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder showCurrent() {
-        return this.command(SHOW_CURRENT)
-    }
-
-    /**
-     * Добавляет команду `push`.
-     *
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder push() {
-        return this.command(PUSH)
-    }
-
-    /**
-     * Добавляет команду `origin`.
-     *
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder origin() {
-        return this.command(ORIGIN)
-    }
-
-    /**
-     * Добавляет команду `diff`.
-     *
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder diff() {
-        return this.command(DIFF)
-    }
-
-    /**
-     * Добавляет команду `list`.
-     *
-     * @return текущий экземпляр `CommandBuilder`.
-     */
-    CommandBuilder list() {
-        return this.command(LIST)
+    CommandBuilder version() {
+        return this.command(VERSION)
     }
 
     /**
