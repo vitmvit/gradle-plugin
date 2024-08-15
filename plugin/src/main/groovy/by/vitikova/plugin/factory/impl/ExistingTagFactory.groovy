@@ -21,8 +21,7 @@ class ExistingTagFactory implements TagFactory {
     @Override
     String createTagName(String branchName, String latestTagVersion) {
         switch (branchName) {
-            case Branch.DEV.name():
-            case Branch.QA.name():
+            case Branch.DEV.name() || Branch.QA.name():
                 latestTagVersion = gitRepository.findLatestDevAndQATagByTagVersion(latestTagVersion)
                 def tagNumbers = findAndSplitTagVersionByDot(latestTagVersion)
                 incrementMinorVersion(tagNumbers)
