@@ -10,14 +10,14 @@ import static by.vitikova.plugin.constant.Constant.*
  * <p> Данный класс позволяет последовательно накапливать команды и затем выполнять их,
  * возвращая результаты выполнения или сообщения об ошибках.</p>
  *
- * <p> Пример использования:</p>
+ * <p> Пример использования:
  * <pre>
  * CommandBuilder.builder()
  *     .git()
  *     .version()
  *     .execute()
  * </pre>
- *
+ * </p>
  * @author VitMVit
  */
 class CommandBuilder {
