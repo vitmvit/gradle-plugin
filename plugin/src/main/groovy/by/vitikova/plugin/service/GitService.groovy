@@ -82,7 +82,7 @@ class GitService extends DefaultTask {
                 def tagVersion = gitRepository.findCurrentTagVersion()
                 def exceptionMessage = tagVersion.isEmpty()
                         ? Constant.UNCOMMITTED_CHANGES_NO_TAG_MESSAGE
-                        : Constant.UNCOMMITTED_CHANGES_WITH_TAG_MESSAGE + tagVersion + ".uncommitted";
+                        : Constant.UNCOMMITTED_CHANGES_WITH_TAG_MESSAGE + tagVersion + Constant.POSTFIX_UNCOMMITTED;
                 throw new UncommittedException(exceptionMessage)
             }
         }

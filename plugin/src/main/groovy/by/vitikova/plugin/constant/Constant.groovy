@@ -36,6 +36,7 @@ interface Constant {
     // regex
     public static final String VERSION_REGEX = /\d+\.\d+/
     public static final String DOT = '\\.'
+    public static final String POSTFIX_UNCOMMITTED = ".uncommitted"
 
     // message
     public static final String GIT_NOT_FOUND_MESSAGE = "Unable to locate Git on this machine. Please ensure it is installed and accessible from the command line!"
