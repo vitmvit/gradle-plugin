@@ -1,0 +1,15 @@
+plugins {
+    id "java"
+    id("tag-plugin") version "1.0"
+}
+
+group 'by.vitikova.plugin'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+build.finalizedBy pushTag {
+    isUncommitted = true
+}
