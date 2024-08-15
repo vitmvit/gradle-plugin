@@ -18,6 +18,7 @@ import static by.vitikova.plugin.constant.Constant.*
  *     .execute()
  * </pre>
  * </p>
+ *
  * @author VitMVit
  */
 class CommandBuilder {
