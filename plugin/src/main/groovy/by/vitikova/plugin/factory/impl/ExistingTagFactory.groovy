@@ -4,6 +4,8 @@ import by.vitikova.plugin.constant.Branch
 import by.vitikova.plugin.constant.Constant
 import by.vitikova.plugin.factory.TagFactory
 import by.vitikova.plugin.repository.impl.GitRepositoryImpl
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Реализация `TagFactory`, которая создает имя тега, основываясь на
@@ -16,29 +18,37 @@ import by.vitikova.plugin.repository.impl.GitRepositoryImpl
  */
 class ExistingTagFactory implements TagFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExistingTagFactory.class)
     def gitRepository = new GitRepositoryImpl()
 
     @Override
     String createTagName(String branchName, String latestTagVersion) {
+        logger.info("EXISTING TAG FACTORY Creating tag name for branch: {}, with latest tag version: {}", branchName, latestTagVersion)
         switch (branchName) {
             case Branch.DEV.name() || Branch.QA.name():
                 latestTagVersion = gitRepository.findLatestDevAndQATagByTagVersion(latestTagVersion)
+                logger.debug("EXISTING TAG FACTORY Latest tag version for DEV/QA: {}", latestTagVersion)
                 def tagNumbers = findAndSplitTagVersionByDot(latestTagVersion)
-                incrementMinorVersion(tagNumbers)
-                break
+                def newTagVersion = incrementMinorVersion(tagNumbers)
+                logger.info("EXISTING TAG FACTORY Incrementing minor version resulting in new tag version: {}", newTagVersion)
+                return newTagVersion
             case Branch.STAGE.name():
                 def tagNumbers = findAndSplitTagVersionByDot(latestTagVersion)
-                addRCPostfix(tagNumbers)
-                break
+                def rcTagVersion = addRCPostfix(tagNumbers)
+                logger.info("EXISTING TAG FACTORY Adding RC postfix, resulting in tag version: {}", rcTagVersion)
+                return rcTagVersion
             case Branch.MASTER.name():
                 def tagNumbers = findAndSplitTagVersionByDot(latestTagVersion)
-                incrementMajorVersion(tagNumbers)
-                break
+                def majorTagVersion = incrementMajorVersion(tagNumbers)
+                logger.info("EXISTING TAG FACTORY Incrementing major version resulting in new tag version: {}", majorTagVersion)
+                return majorTagVersion
             default:
                 latestTagVersion = gitRepository.findLatestSnapshotTagByTagVersion(latestTagVersion)
+                logger.debug("EXISTING TAG FACTORY Latest tag version for SNAPSHOT: {}", latestTagVersion)
                 def tagNumbers = findAndSplitTagVersionByDot(latestTagVersion)
-                addSnapshotPostfix(tagNumbers)
-                break
+                def snapshotTagVersion = addSnapshotPostfix(tagNumbers)
+                logger.info("EXISTING TAG FACTORY Adding SNAPSHOT postfix, resulting in tag version: {}", snapshotTagVersion)
+                return snapshotTagVersion
         }
     }
 

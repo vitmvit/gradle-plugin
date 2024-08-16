@@ -3,6 +3,8 @@ package by.vitikova.plugin.factory.impl
 import by.vitikova.plugin.constant.Branch
 import by.vitikova.plugin.constant.Constant
 import by.vitikova.plugin.factory.TagFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Реализация `TagFactory`, которая создает имя тега, основываясь на
@@ -15,15 +17,21 @@ import by.vitikova.plugin.factory.TagFactory
  */
 class NoExistingTagFactory implements TagFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(NoExistingTagFactory.class)
+
     @Override
     String createTagName(String branchName, String latestTagVersion) {
         latestTagVersion = Constant.DEFAULT_TAG_VERSION
+        logger.info("NO EXISTING TAG FACTORY Creating tag name for branch: {}, using default version: {}", branchName, latestTagVersion)
 
         if (branchName in [Branch.DEV.name(), Branch.QA.name(), Branch.MASTER.name()]) {
+            logger.info("NO EXISTING TAG FACTORY Returning tag name for branch {}: {}", branchName, latestTagVersion)
             return latestTagVersion
         } else if (branchName == Branch.STAGE.name()) {
+            logger.info("NO EXISTING TAG FACTORY Adding RC postfix for branch {}: {}", branchName, latestTagVersion)
             return "$latestTagVersion$Constant.RC"
         } else {
+            logger.info("NO EXISTING TAG FACTORY Adding SNAPSHOT postfix for branch {}: {}", branchName, latestTagVersion)
             return "$latestTagVersion$Constant.SNAPSHOT"
         }
     }

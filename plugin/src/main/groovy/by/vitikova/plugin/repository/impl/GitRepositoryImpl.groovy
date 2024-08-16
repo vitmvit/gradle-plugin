@@ -4,6 +4,8 @@ import by.vitikova.plugin.builder.CommandBuilder
 import by.vitikova.plugin.constant.Constant
 import by.vitikova.plugin.constant.Order
 import by.vitikova.plugin.repository.GitRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Реализация интерфейса `GitRepository`, которая предоставляет методы для
@@ -17,6 +19,8 @@ import by.vitikova.plugin.repository.GitRepository
  */
 class GitRepositoryImpl implements GitRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(GitRepositoryImpl.class)
+
     /**
      * Возвращает текущую версию Git, установленного на системе.
      *
@@ -24,6 +28,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findGitVersion() {
+        logger.info("GIT REPOSITORY Finding Git version...")
         return executeGitCommand { builder ->
             builder.git().version().execute()
         }
@@ -36,6 +41,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findUncommittedChanges() {
+        logger.info("GIT REPOSITORY Finding uncommitted changes...")
         return executeGitCommand { builder ->
             builder.git().diff().execute()
         }
@@ -48,6 +54,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findLatestTagVersion() {
+        logger.info("GIT REPOSITORY Finding latest tag version...")
         return executeGitCommand { builder ->
             builder.git().describe().tags().abbrev(0).execute()
         }
@@ -60,6 +67,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findCurrentTagVersion() {
+        logger.info("GIT REPOSITORY Finding current tag version...")
         return executeGitCommand { builder ->
             builder.git().describe().tags().execute()
         }
@@ -72,6 +80,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findCurrentBranchName() {
+        logger.info("GIT REPOSITORY Finding current branch name...")
         return executeGitCommand { builder ->
             builder.git().branch().showCurrent().execute()
         }
@@ -88,6 +97,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findLatestDevAndQATagByTagVersion(String tagVersion) {
+        logger.info("GIT REPOSITORY Finding latest DEV and QA tag for version: {}", tagVersion)
         return findLatestTagByPattern("${tagVersion.find(/v(\d+)/)}\\.*", false, tagVersion)
     }
 
@@ -99,6 +109,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String findLatestSnapshotTagByTagVersion(String tagVersion) {
+        logger.info("GIT REPOSITORY Finding latest snapshot tag for version: {}", tagVersion)
         return findLatestTagByPattern("${tagVersion.find(/v(\d+)/)}\\.*$Constant.SNAPSHOT", true, tagVersion)
     }
 
@@ -110,6 +121,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String pushTagToLocal(String tagName) {
+        logger.info("GIT REPOSITORY Pushing local tag: {}", tagName)
         return executeGitCommand { builder ->
             builder.git().tag().command(tagName).execute()
         }
@@ -123,6 +135,7 @@ class GitRepositoryImpl implements GitRepository {
      */
     @Override
     String pushTagToOrigin(String tagName) {
+        logger.info("GIT REPOSITORY Pushing tag to origin: {}", tagName)
         return executeGitCommand { builder ->
             builder.git().push().origin().command(tagName).execute()
         }
@@ -135,6 +148,7 @@ class GitRepositoryImpl implements GitRepository {
      * @return результат выполнения команды
      */
     private static String executeGitCommand(Closure commandClosure) {
+        logger.info("GIT REPOSITORY Executing Git command...")
         return CommandBuilder.builder().with(commandClosure)
     }
 
@@ -147,6 +161,8 @@ class GitRepositoryImpl implements GitRepository {
      * @return строка с последней найденной версией тега или переданная версия, если тег не найден
      */
     private static String findLatestTagByPattern(String pattern, boolean isSnapshot, String tagVersion) {
+        logger.info("GIT REPOSITORY Finding latest tag by pattern: {}, isSnapshot: {}", pattern, isSnapshot)
+
         def commandBuilder = CommandBuilder.builder()
         def result = commandBuilder.git()
                 .tag()
@@ -155,10 +171,6 @@ class GitRepositoryImpl implements GitRepository {
                 .sort('version:refname', Order.DESC)
                 .execute()
                 .lines()
-        if (isSnapshot) {
-            return result.find { it.endsWith(Constant.SNAPSHOT) } ?: tagVersion
-        } else {
-            return result.find { it.endsWith(Constant.SNAPSHOT) || it.endsWith(Constant.RC) } ?: tagVersion
-        }
+        return isSnapshot ? result.find { it.endsWith(Constant.SNAPSHOT) } ?: tagVersion : result.find { it.endsWith(Constant.SNAPSHOT) || it.endsWith(Constant.RC) } ?: tagVersion
     }
 }

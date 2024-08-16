@@ -10,6 +10,8 @@ import by.vitikova.plugin.repository.impl.GitRepositoryImpl
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Сервис для работы с Git, реализующий логику для создания и пуша тегов
@@ -38,21 +40,26 @@ import org.gradle.api.tasks.TaskAction
  */
 class GitService extends DefaultTask {
 
+    private static final Logger logger = LoggerFactory.getLogger(GitService.class)
+
     @Input
     def gitRepository = new GitRepositoryImpl()
+
     @Input
     def noTagExistsFactory = new NoExistingTagFactory()
+
     @Input
     def tagExistsFactory = new ExistingTagFactory()
 
     @TaskAction
     void pushTag() {
+        logger.info("GIT SERVICE Starting to push tag...")
         validateGitVersion()
         checkForUncommittedChanges()
         def latestTagVersion = gitRepository.findLatestTagVersion()
-        logger.info(latestTagVersion)
+        logger.info("GIT SERVICE Latest tag version found: {}", latestTagVersion)
         def branchName = gitRepository.findCurrentBranchName()
-        logger.info(branchName)
+        logger.info("GIT SERVICE Current branch name: {}", branchName)
         if (latestTagVersion.isEmpty()) {
             handleNoExistingTag(branchName, latestTagVersion)
         } else {
@@ -64,10 +71,12 @@ class GitService extends DefaultTask {
      * Проверяет, установлена ли версия Git, и выбрасывает исключение, если ее нет.
      */
     private void validateGitVersion() {
+        logger.info("GIT SERVICE Validating Git version...")
         try {
+            logger.info("GIT SERVICE Git version is valid.")
             gitRepository.findGitVersion()
         } catch (IOException e) {
-            logger.error e.getMessage()
+            logger.error("GIT SERVICE Git version not found: {}", e.getMessage())
             throw new NotFoundException(Constant.GIT_NOT_FOUND_MESSAGE)
         }
     }
@@ -77,12 +86,14 @@ class GitService extends DefaultTask {
      */
     private void checkForUncommittedChanges() {
         if (project.pushTag.isUncommitted) {
+            logger.info("GIT SERVICE Checking for uncommitted changes...")
             def uncommitted = gitRepository.findUncommittedChanges()
             if (!uncommitted.isEmpty()) {
                 def tagVersion = gitRepository.findCurrentTagVersion()
                 def exceptionMessage = tagVersion.isEmpty()
                         ? Constant.UNCOMMITTED_CHANGES_NO_TAG_MESSAGE
                         : Constant.UNCOMMITTED_CHANGES_WITH_TAG_MESSAGE + tagVersion + Constant.POSTFIX_UNCOMMITTED;
+                logger.error("GIT SERVICE Uncommitted changes found: {}", exceptionMessage)
                 throw new UncommittedException(exceptionMessage)
             }
         }
@@ -95,7 +106,9 @@ class GitService extends DefaultTask {
      * @param latestTagVersion последняя версия тега
      */
     private void handleNoExistingTag(String branchName, String latestTagVersion) {
+        logger.info("GIT SERVICE Handling case of no existing tag...")
         def tagName = noTagExistsFactory.createTagName(branchName, latestTagVersion)
+        logger.info("GIT SERVICE Creating new tag, Local tag pushed, Tag pushed to origin: {}", tagName)
         gitRepository.pushTagToLocal(tagName)
         gitRepository.pushTagToOrigin(tagName)
         logger.warn Constant.TAG_NAME_WARNING_MESSAGE + tagName
@@ -108,11 +121,15 @@ class GitService extends DefaultTask {
      * @param latestTagVersion последняя версия тега
      */
     private void handleExistingTag(String branchName, String latestTagVersion) {
+        logger.info("GIT SERVICE Handling existing tag... Branch: {}, Latest Tag Version: {}", branchName, latestTagVersion)
         def currentTagVersion = gitRepository.findCurrentTagVersion()
         if (latestTagVersion == currentTagVersion) {
+            logger.error("GIT SERVICE Tag already exists: {}", currentTagVersion)
             throw new TagAlreadyExistException(Constant.TAG_ALREADY_EXISTS_MESSAGE + currentTagVersion)
         } else {
+            logger.info("GIT SERVICE Creating new tag because the latest tag version is different from the current tag version.")
             def tagName = tagExistsFactory.createTagName(branchName, latestTagVersion)
+            logger.info("GIT SERVICE Creating tag: {}", tagName)
             gitRepository.pushTagToLocal(tagName)
             gitRepository.pushTagToOrigin(tagName)
             logger.warn Constant.TAG_NAME_WARNING_MESSAGE + tagName

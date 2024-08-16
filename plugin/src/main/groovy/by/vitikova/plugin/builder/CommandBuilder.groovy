@@ -1,6 +1,8 @@
 package by.vitikova.plugin.builder
 
 import by.vitikova.plugin.constant.Order
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static by.vitikova.plugin.constant.Constant.*
 
@@ -23,6 +25,7 @@ import static by.vitikova.plugin.constant.Constant.*
  */
 class CommandBuilder {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommandBuilder.class)
     List<String> commands
 
     private CommandBuilder() {
@@ -40,6 +43,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder abbrev(int number) {
+        logger.debug("COMMAND BUILDER Adding command: abbrev {}", number)
         return this.command("$ABBREV$number")
     }
 
@@ -49,6 +53,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder branch() {
+        logger.debug("COMMAND BUILDER Adding command: branch")
         return this.command(BRANCH)
     }
 
@@ -58,6 +63,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder describe() {
+        logger.debug("COMMAND BUILDER Adding command: describe")
         return this.command(DESCRIBE)
     }
 
@@ -67,6 +73,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder diff() {
+        logger.debug("COMMAND BUILDER Adding command: diff")
         return this.command(DIFF)
     }
 
@@ -76,6 +83,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder git() {
+        logger.debug("COMMAND BUILDER Adding command: git")
         return this.command(GIT)
     }
 
@@ -85,6 +93,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder list() {
+        logger.debug("COMMAND BUILDER Adding command: list")
         return this.command(LIST)
     }
 
@@ -94,6 +103,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder origin() {
+        logger.debug("COMMAND BUILDER Adding command: origin")
         return this.command(ORIGIN)
     }
 
@@ -103,6 +113,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder push() {
+        logger.debug("COMMAND BUILDER Adding command: push")
         return this.command(PUSH)
     }
 
@@ -112,6 +123,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder showCurrent() {
+        logger.debug("COMMAND BUILDER Adding command: showCurrent")
         return this.command(SHOW_CURRENT)
     }
 
@@ -121,6 +133,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder tag() {
+        logger.debug("COMMAND BUILDER Adding command: tag")
         return this.command(TAG)
     }
 
@@ -130,6 +143,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder tags() {
+        logger.debug("COMMAND BUILDER Adding command: tags")
         return this.command(TAGS)
     }
 
@@ -139,6 +153,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder version() {
+        logger.debug("COMMAND BUILDER Adding command: version")
         return this.command(VERSION)
     }
 
@@ -150,6 +165,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder sort(String by, Order order) {
+        logger.debug("COMMAND BUILDER Adding command: sort by {} in order {}", by, order)
         return this.command("$SORT${order.name()}$by")
     }
 
@@ -160,6 +176,7 @@ class CommandBuilder {
      * @return текущий экземпляр `CommandBuilder`.
      */
     CommandBuilder command(String command) {
+        logger.debug("COMMAND BUILDER Adding command: {}", command)
         this.commands.add(command)
         return this
     }
@@ -171,12 +188,18 @@ class CommandBuilder {
      */
     String execute() {
         if (commands.isEmpty()) {
-            throw new IllegalStateException("Нет команд для выполнения.")
+            logger.error("COMMAND BUILDER No command.")
+            throw new IllegalStateException("No command.")
         }
+        logger.info("COMMAND BUILDER Executing commands: {}", commands)
+
         def error = new StringBuilder()
         def process = this.commands.execute()
         process.consumeProcessErrorStream(error)
+
         def result = process.in.text.trim()
+        logger.debug("COMMAND BUILDER Process result: {}", result)
+        logger.debug("COMMAND BUILDER Process error: {}", error.toString().trim())
         return error.isEmpty() ? result : error.toString().trim()
     }
 }
