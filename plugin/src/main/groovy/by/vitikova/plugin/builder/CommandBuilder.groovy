@@ -166,7 +166,7 @@ class CommandBuilder {
      */
     CommandBuilder sort(String by, Order order) {
         logger.debug("COMMAND BUILDER Adding command: sort by {} in order {}", by, order)
-        return this.command("$SORT${order.name()}$by")
+        return this.command("$SORT${order.getName()}$by")
     }
 
     /**

@@ -24,3 +24,7 @@ gradlePlugin {
         }
     }
 }
+
+tasks.named("publishToMavenLocal") {
+    dependsOn("clean", "build")
+}

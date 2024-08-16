@@ -23,11 +23,10 @@ class NoExistingTagFactory implements TagFactory {
     String createTagName(String branchName, String latestTagVersion) {
         latestTagVersion = Constant.DEFAULT_TAG_VERSION
         logger.info("NO EXISTING TAG FACTORY Creating tag name for branch: {}, using default version: {}", branchName, latestTagVersion)
-
-        if (branchName in [Branch.DEV.name(), Branch.QA.name(), Branch.MASTER.name()]) {
+        if (branchName == Branch.DEV.getName() || branchName == Branch.QA.getName() || branchName == Branch.MASTER.getName()) {
             logger.info("NO EXISTING TAG FACTORY Returning tag name for branch {}: {}", branchName, latestTagVersion)
             return latestTagVersion
-        } else if (branchName == Branch.STAGE.name()) {
+        } else if (branchName == Branch.STAGE.getName()) {
             logger.info("NO EXISTING TAG FACTORY Adding RC postfix for branch {}: {}", branchName, latestTagVersion)
             return "$latestTagVersion$Constant.RC"
         } else {

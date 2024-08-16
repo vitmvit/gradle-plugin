@@ -1,7 +1,4 @@
 package by.vitikova.plugin.constant
-
-import lombok.Getter
-
 /**
  * Перечисление `Branch` представляет различные ветки в контексте разработки.
  *
@@ -10,7 +7,6 @@ import lombok.Getter
  *
  * @author VitMVit
  */
-@Getter
 enum Branch {
 
     /** Ветка разработки. */
@@ -29,5 +25,9 @@ enum Branch {
 
     Branch(String name) {
         this.name = name
+    }
+
+    String getName() {
+        return name
     }
 }

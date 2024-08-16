@@ -1,7 +1,4 @@
 package by.vitikova.plugin.constant
-
-import lombok.Getter
-
 /**
  * Перечисление `Order` определяет порядок сортировки, который может быть использован
  * при выполнении операций сортировки в приложении.
@@ -14,7 +11,6 @@ import lombok.Getter
  *
  * @author VitMVit
  */
-@Getter
 enum Order {
 
     ASC(''),
@@ -24,5 +20,9 @@ enum Order {
 
     Order(String name) {
         this.name = name
+    }
+
+    String getName() {
+        return name
     }
 }
