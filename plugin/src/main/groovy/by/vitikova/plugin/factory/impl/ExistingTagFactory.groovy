@@ -54,12 +54,14 @@ class ExistingTagFactory implements TagFactory {
 
     private static def incrementMinorVersion(String[] tagNumbers) {
         tagNumbers[1] = (tagNumbers[1] as int) + 1
+        logger.info("MinorVersion {}", tagNumbers)
         "v${tagNumbers.join('.')}"
     }
 
     private static def incrementMajorVersion(String[] tagNumbers) {
         tagNumbers[0] = (tagNumbers[0] as int) + 1
         tagNumbers[1] = '0'
+        logger.info("MajorVersion {}", tagNumbers)
         "v${tagNumbers.join('.')}"
     }
 
