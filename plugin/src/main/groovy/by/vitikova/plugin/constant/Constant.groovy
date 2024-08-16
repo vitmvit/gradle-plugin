@@ -45,4 +45,5 @@ interface Constant {
     public static final String UNCOMMITTED_CHANGES_WITH_TAG_MESSAGE = "Uncommitted changes detected in the current tag version: "
     public static final String TAG_NAME_WARNING_MESSAGE = "The current commit is assigned tag: "
     public static final String TAG_ALREADY_EXISTS_MESSAGE = "The current state of the project is already tagged: "
+    public static final String NO_TAG_MESSAGE = "fatal: No names found, cannot describe anything"
 }

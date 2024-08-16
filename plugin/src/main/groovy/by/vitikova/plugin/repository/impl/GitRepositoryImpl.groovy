@@ -48,28 +48,44 @@ class GitRepositoryImpl implements GitRepository {
     }
 
     /**
-     * Находит и возвращает последнюю версию тега в репозитории.
+     * Находит и возвращает последнюю версию тега в репозитории Git.
      *
-     * @return строка, содержащая последнюю версию тега
+     * Этот метод использует команду Git для получения последнего тега, к которому
+     * был применён коммит. Если тегов нет, возвращает пустую строку.
+     *
+     * @return строка, содержащая последнюю версию тега или пустую строку,
+     * если тегов не найдено.
      */
     @Override
     String findLatestTagVersion() {
         logger.info("GIT REPOSITORY Finding latest tag version...")
         return executeGitCommand { builder ->
-            builder.git().describe().tags().abbrev(0).execute()
+            String result = builder.git().describe().tags().abbrev(0).execute()
+            if (result.contains(Constant.NO_TAG_MESSAGE)) {
+                return ""
+            }
+            return result
         }
     }
 
     /**
-     * Находит и возвращает текущую версию тега.
+     * Находит и возвращает текущую версию тега в репозитории Git.
      *
-     * @return строка, содержащая текущую версию тега
+     * Этот метод использует команду Git для получения текущего тега, связанного
+     * с последним коммитом. Если тегов нет, возвращает пустую строку.
+     *
+     * @return строка, содержащая текущую версию тега или пустую строку,
+     * если тегов не найдено.
      */
     @Override
     String findCurrentTagVersion() {
         logger.info("GIT REPOSITORY Finding current tag version...")
         return executeGitCommand { builder ->
-            builder.git().describe().tags().execute()
+            String result = builder.git().describe().tags().execute()
+            if (result.contains(Constant.NO_TAG_MESSAGE)) {
+                return ""
+            }
+            return result
         }
     }
 
