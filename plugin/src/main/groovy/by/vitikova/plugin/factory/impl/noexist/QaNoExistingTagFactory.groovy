@@ -1,6 +1,5 @@
 package by.vitikova.plugin.factory.impl.noexist
 
-
 import by.vitikova.plugin.constant.Constant
 import by.vitikova.plugin.factory.TagFactory
 import org.slf4j.Logger

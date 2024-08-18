@@ -1,6 +1,5 @@
 package by.vitikova.plugin.factory.impl.exist
 
-
 import by.vitikova.plugin.factory.TagFactory
 import by.vitikova.plugin.repository.impl.GitRepositoryImpl
 import by.vitikova.plugin.util.TagUtil
