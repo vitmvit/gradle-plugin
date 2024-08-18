@@ -1,11 +1,13 @@
 package by.vitikova.plugin.service
 
+import by.vitikova.plugin.constant.Branch
 import by.vitikova.plugin.constant.Constant
 import by.vitikova.plugin.exception.NotFoundException
 import by.vitikova.plugin.exception.TagAlreadyExistException
 import by.vitikova.plugin.exception.UncommittedException
-import by.vitikova.plugin.factory.impl.ExistingTagFactory
-import by.vitikova.plugin.factory.impl.NoExistingTagFactory
+import by.vitikova.plugin.factory.TagFactory
+import by.vitikova.plugin.factory.impl.exist.*
+import by.vitikova.plugin.factory.impl.noexist.*
 import by.vitikova.plugin.repository.impl.GitRepositoryImpl
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
@@ -27,8 +29,17 @@ import org.slf4j.LoggerFactory
  *
  * <p>Класс использует следующие фабрики для управления тегами:
  * <ul>
- *     <li>{@link NoExistingTagFactory} - для создания тегов, когда тегов еще не существует.</li>
- *     <li>{@link ExistingTagFactory} - для создания тегов, если они уже существуют.</li>
+ *     <li>{@link DevExistingTagFactory} - для создания тегов, когда тегов еще не существует, для dev.</li>
+ *     <li>{@link QaExistingTagFactory} - для создания тегов, когда тегов еще не существует, для qa.</li>
+ *     <li>{@link MasterExistingTagFactory} - для создания тегов, когда тегов еще не существует, для master.</li>
+ *     <li>{@link StageExistingTagFactory} - для создания тегов, когда тегов еще не существует, для stage.</li>
+ *     <li>{@link OtherBranchExistingTagFactory} - для создания тегов, когда тегов еще не существует, для других ветвей.</li>
+ *
+ *     <li>{@link DevExistingTagFactory} - для создания тегов, если они уже существуют, для dev.</li>
+ *     <li>{@link QaExistingTagFactory} - для создания тегов, если они уже существуют, для qa.</li>
+ *     <li>{@link MasterExistingTagFactory} - для создания тегов, если они уже существуют, для master.</li>
+ *     <li>{@link StageExistingTagFactory} - для создания тегов, если они уже существуют, для stage.</li>
+ *     <li>{@link OtherBranchExistingTagFactory} - для создания тегов, если они уже существуют, для других ветвей.</li>
  * </ul>
  * </p>
  *
@@ -45,12 +56,6 @@ class GitService extends DefaultTask {
     @Input
     def gitRepository = new GitRepositoryImpl()
 
-    @Input
-    def noTagExistsFactory = new NoExistingTagFactory()
-
-    @Input
-    def tagExistsFactory = new ExistingTagFactory()
-
     @TaskAction
     void pushTag() {
         logger.info("GIT SERVICE Starting to push tag...")
@@ -61,7 +66,7 @@ class GitService extends DefaultTask {
         def branchName = gitRepository.findCurrentBranchName()
         logger.info("GIT SERVICE Current branch name: {}", branchName)
         if (latestTagVersion.isEmpty()) {
-            handleNoExistingTag(branchName, latestTagVersion)
+            handleNoExistingTag(branchName, Constant.DEFAULT_TAG_VERSION)
         } else {
             handleExistingTag(branchName, latestTagVersion)
         }
@@ -107,10 +112,11 @@ class GitService extends DefaultTask {
      */
     private void handleNoExistingTag(String branchName, String latestTagVersion) {
         logger.info("GIT SERVICE Handling case of no existing tag...")
-        def tagName = noTagExistsFactory.createTagName(branchName, latestTagVersion)
+        TagFactory tagFactory = getTagFactory(branchName, false)
+        def tagName = tagFactory.createTagName(branchName, latestTagVersion)
         logger.info("GIT SERVICE Creating new tag, Local tag pushed, Tag pushed to origin: {}", tagName)
-        gitRepository.pushTagToLocal(tagName)
-        gitRepository.pushTagToOrigin(tagName)
+        gitRepository.pushTagToLocal(tagName);
+        gitRepository.pushTagToOrigin(tagName);
         logger.warn Constant.TAG_NAME_WARNING_MESSAGE + tagName
     }
 
@@ -128,11 +134,35 @@ class GitService extends DefaultTask {
             throw new TagAlreadyExistException(Constant.TAG_ALREADY_EXISTS_MESSAGE + currentTagVersion)
         } else {
             logger.info("GIT SERVICE Creating new tag because the latest tag version is different from the current tag version.")
-            def tagName = tagExistsFactory.createTagName(branchName, latestTagVersion)
+            TagFactory tagFactory = getTagFactory(branchName, true)
+            def tagName = tagFactory.createTagName(branchName, latestTagVersion)
             logger.info("GIT SERVICE Creating tag: {}", tagName)
             gitRepository.pushTagToLocal(tagName)
             gitRepository.pushTagToOrigin(tagName)
             logger.warn Constant.TAG_NAME_WARNING_MESSAGE + tagName
+        }
+    }
+
+    /**
+     * Возвращает соответствующую фабрику тегов в зависимости от существующих тегов для указанной ветки.
+     *
+     * @param branchName название ветки, для которой требуется фабрика тегов.
+     * @param exists флаг, указывающий, существуют ли теги уже.
+     * @return объект {@link TagFactory}, отвечающий за создание тегов
+     * для указанной ветки.
+     */
+    private static TagFactory getTagFactory(String branchName, boolean exists) {
+        switch (branchName) {
+            case Branch.DEV.getName():
+                return exists ? new DevExistingTagFactory() : new DevNoExistingTagFactory();
+            case Branch.QA.getName():
+                return exists ? new QaExistingTagFactory() : new QaNoExistingTagFactory();
+            case Branch.MASTER.getName():
+                return exists ? new MasterExistingTagFactory() : new MasterNoExistingTagFactory();
+            case Branch.STAGE.getName():
+                return exists ? new StageExistingTagFactory() : new StageNoExistingTagFactory();
+            default:
+                return exists ? new OtherBranchExistingTagFactory() : new OtherBranchNoExistingTagFactory();
         }
     }
 }
